@@ -1,0 +1,45 @@
+version: '3.7'
+services:
+        database:
+                image: mysql:5.7
+                volumes:
+                        - "./data:/var/lib/mysql"
+                environment:
+                        MYSQL_ROOT_PASSWORD: password
+                        MYSQL_DATABASE: pieski
+                        MYSQL_USER: ewa
+                        MYSQL_PASSWORD: ewa
+                networks:
+                        - backend
+                deploy:
+                        replicas: 2
+        phpmyadmin:
+                image: phpmyadmin/phpmyadmin
+                depends_on: 
+                        - database
+                ports: 
+                        - '8080:80'
+                environment:
+                        PMA_HOST: database
+                        MYSQL_ROOT_PASSWORD: password
+                networks:
+                        - backend
+
+                deploy: 
+                        replicas: 1          
+        php:
+                image: php:7.4-apache
+                ports:
+                        - 6666:80/tcp
+                volumes:
+                        - "./DocumentRoot:/var/www/html"
+                networks: 
+                        - backend
+                        - frontend
+                deploy: 
+                        replicas: 2          
+networks:
+        frontend:
+        backend:
+volumes: 
+        data:
